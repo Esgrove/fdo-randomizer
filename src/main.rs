@@ -5,7 +5,7 @@ extern crate colored;
 use anyhow::{Context, Result};
 use clap::Parser;
 
-use crate::randomizer::fdo_impro_randomizer;
+use crate::randomizer::generate_unique_permutations;
 use colored::Colorize;
 use std::path::Path;
 use std::{env, fs};
@@ -78,7 +78,7 @@ fn main() -> Result<()> {
         }
     };
 
-    fdo_impro_randomizer(
+    generate_unique_permutations(
         &absolute_input_path,
         absolute_output_root,
         permutations,

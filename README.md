@@ -42,5 +42,5 @@ Options:
 Debug errors:
 
 ```shell
-RUST_BACKTRACE=1 cargo run -- FDO 8 --force --output "$HOME/Downloads/FDO"
+RUST_BACKTRACE=1 cargo run -- FOLDER 8 --force --output "$HOME/Downloads/IMPRO"
 ```
