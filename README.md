@@ -2,27 +2,26 @@
 
 Generate randomized play orders from a given folder of audio files.
 
-## Dependencies
+Created for the [Finnish Dance Organization](https://fdo.fi/) "Improvisation" competition category music.
+
+## Python version
+
+> [!NOTE]  
+> You should probably be using the newer and better Rust version instead
+
+### Dependencies
 
 - Python 3.11+ & Poetry
 - Click
 - colorama
 
-## Run
+### Run
 
 ```shell
 python3 randomizer.py <input_dir> [num_permutations]
 ```
 
 ## Rust version
-
-Run:
-
-```shell
-cargo run --release -- --help
-```
-
-Usage:
 
 ```
 Usage: fdo-randomizer [OPTIONS] <INPUT_DIR> [PERMUTATIONS]
@@ -37,6 +36,16 @@ Options:
   -v, --verbose               Verbose output
   -h, --help                  Print help
   -V, --version               Print version
+```
+
+### Run
+
+[Install Rust](https://www.rust-lang.org/tools/install) and then:
+
+```shell
+cargo run --release -- --help
+
+cargo run --release -- "input dir" 10
 ```
 
 Debug errors:
