@@ -11,21 +11,23 @@ import shutil
 import sys
 from pathlib import Path
 
-from colorprint import print_warn, print_error, print_bold
+import click
+
+from colorprint import print_bold, print_error, print_warn
 
 
 def fdo_impro_randomizer(input_path: str, permutations=1, verbose=False):
     """
     Generate randomized play orders for audio files from the given input directory.
     Copies audio files from input folder to new folders with numbered names in the picked random order.
-    Permutations parameter controls how many folders to generate.
+    The permutation parameter controls how many folders to generate.
     """
     input_path = Path(input_path.strip()).resolve()
     if not input_path.exists():
         sys.exit(f"Input directory does not exist: '{input_path}'")
 
     files: list[Path] = sorted(
-        f for f in input_path.iterdir() if f.suffix in (".aif", ".aiff", ".wav", ".flac", ".alac", ".mp3", ".m4a")
+        f for f in input_path.iterdir() if f.suffix in (".aif", ".aiff", ".wav", ".flac", ".mp3", ".m4a")
     )
     if not files:
         sys.exit(f"No audio files found in: '{input_path}'")
@@ -75,20 +77,33 @@ def _check_consecutive_tracks_from_same_artist(files: list[Path]) -> bool:
     Returns false if there are no consecutive files with the same artist name.
     This assumes all files are named in the format: <artist> - <title>
     """
-    for index, file in enumerate(files[1:]):
-        artist = file.name.split(" - ")[0]
-        previous_artist = files[index].name.split(" - ")[0]
-        if artist == previous_artist:
+    if len(files) < 2:
+        return False
+
+    for previous, current in zip(files, files[1:]):
+        if previous.name.split(" - ", 1)[0].lower() == current.name.split(" - ", 1)[0].lower():
             return True
 
     return False
 
 
-if __name__ == "__main__":
+@click.command()
+@click.help_option("-h", "--help")
+@click.argument("input_dir", type=click.Path(exists=True), required=True)
+@click.argument("permutations", default=1, type=int)
+def main(input_dir: str, permutations: int):
+    """
+    Generate randomized play orders from a given folder of audio files.
+
+    INPUT_DIR: Input directory.
+
+    PERMUTATIONS: Optional number of permutations to generate (default is 1).
+    """
     try:
-        args = sys.argv[1:]
-        input_dir = args[0] or ""
-        permutations = int(args[1]) if len(args) > 1 else 1
         fdo_impro_randomizer(input_dir, permutations)
     except KeyboardInterrupt:
-        sys.exit("\ninterrupted")
+        sys.exit("\ncancelled")
+
+
+if __name__ == "__main__":
+    main()
