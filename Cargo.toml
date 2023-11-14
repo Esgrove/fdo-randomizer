@@ -1,12 +1,14 @@
 [package]
 name = "fdo-randomizer"
 authors = ["Akseli Lukkarila <esgrove@outlook.com>"]
-description = "FDO Impro song randomizer."
+description = "FDO Impro competition song randomizer."
 edition = "2021"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/Esgrove/fdo_randomizer"
 version = "1.0.0"
+keywords = ["cli", "music", "randomizer"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = { version = "1.0.75", features = ["backtrace"] }
