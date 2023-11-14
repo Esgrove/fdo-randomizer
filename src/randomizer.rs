@@ -5,6 +5,9 @@ use rand::seq::SliceRandom;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use chrono;
+use std::time::{Duration, Instant};
+
 /// Generate randomized play orders for the audio files from the given input directory.
 /// Copies audio files from input folder to new folders with numbered names in the created random order.
 /// The permutation parameter controls how many folders to generate.
@@ -18,7 +21,7 @@ pub fn fdo_impro_randomizer(
     println!(
         "Generating {} randomized audio file permutations to: {}\n",
         permutations,
-        input_path.display()
+        output_root.display()
     );
 
     let mut files: Vec<PathBuf> = fs::read_dir(input_path)
@@ -52,6 +55,9 @@ pub fn fdo_impro_randomizer(
         }
     }
 
+    fs::create_dir_all(output_root.clone()).context("Failed to create output root directory")?;
+
+    let start_time = Instant::now();
     for number in 1..=permutations {
         let output_name = format!("FDO Impro {:0width$}", number, width = permutations_padding);
         let output_path = output_root.join(output_name);
@@ -61,22 +67,34 @@ pub fn fdo_impro_randomizer(
             if verbose { "\n" } else { "" }
         );
         if output_path.exists() {
+            let absolute_output_path =
+                fs::canonicalize(output_path.clone()).context("Failed to get absolute path for output dir")?;
             if overwrite_existing {
                 println!(
                     "{}",
-                    format!("Deleting existing output directory '{}'", output_path.display()).yellow()
+                    format!(
+                        "Deleting existing output directory '{}'",
+                        absolute_output_path.display()
+                    )
+                    .yellow()
                 );
-                fs::remove_dir_all(output_path.clone()).context(format!(
+                fs::remove_dir_all(absolute_output_path.clone()).context(format!(
                     "Failed to remove existing output directory {}",
-                    output_path.display()
+                    absolute_output_path.display()
                 ))?;
             } else {
-                eprintln!("Skipping already existing output dir: '{}'", output_path.display());
+                eprintln!(
+                    "Skipping already existing output dir: '{}'",
+                    absolute_output_path.display()
+                );
                 continue;
             }
         }
 
         fs::create_dir_all(output_path.clone()).context("Failed to create output directory")?;
+
+        let absolute_output_path =
+            fs::canonicalize(output_path).context("Failed to get absolute path for output dir")?;
 
         let mut rng = rand::thread_rng();
         files.shuffle(&mut rng);
@@ -91,7 +109,7 @@ pub fn fdo_impro_randomizer(
                 original_file.file_name().unwrap().to_str().unwrap(),
                 width = files.len().to_string().len()
             );
-            let new_file = output_path.join(new_file_name);
+            let new_file = absolute_output_path.join(new_file_name);
             if verbose {
                 println!("Copying to: {}", new_file.display());
             }
@@ -99,7 +117,46 @@ pub fn fdo_impro_randomizer(
         }
     }
 
+    let elapsed = start_time.elapsed();
+    print_duration(elapsed);
+
     Ok(())
+}
+
+/// Pretty-print elapsed time duration
+fn print_duration(elapsed: Duration) {
+    let duration = chrono::Duration::seconds(elapsed.as_secs() as i64)
+        + chrono::Duration::milliseconds(elapsed.subsec_millis() as i64);
+
+    let hours = duration.num_hours();
+    let minutes = if hours > 0 {
+        duration.num_minutes() % 60
+    } else {
+        duration.num_minutes()
+    };
+    let seconds = if minutes > 0 {
+        duration.num_seconds() % 60
+    } else {
+        duration.num_seconds()
+    };
+    let milliseconds = if seconds > 0 {
+        duration.num_milliseconds() % 60
+    } else {
+        duration.num_milliseconds()
+    };
+
+    let formatted_time = if hours > 0 {
+        format!("{:02}h:{:02}m:{:02}s", hours, minutes, seconds)
+    } else if minutes > 0 {
+        format!("{:02}m:{:02}s", minutes, seconds)
+    } else if seconds > 0 {
+        format!("{:02}s:{:02}ms", seconds, milliseconds)
+    } else {
+        format!("{:02}ms", milliseconds)
+    };
+    if !formatted_time.is_empty() {
+        println!("{} ({:?})", format!("Finished in: {}", formatted_time).green(), elapsed);
+    }
 }
 
 /// Returns false when there are no consecutive files with the same artist name.
