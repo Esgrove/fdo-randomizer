@@ -7,7 +7,7 @@ Created for the [Finnish Dance Organization](https://fdo.fi/) "Improvisation" co
 ## Python version
 
 > [!NOTE]  
-> You should probably be using the newer and better Rust version instead. See [Rust version](#Rust-version).
+> You should probably be using the newer and better Rust version instead.
 
 ### Dependencies
 
