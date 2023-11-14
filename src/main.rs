@@ -13,14 +13,14 @@ use std::{env, fs};
 #[derive(Parser)]
 #[command(author, about, version, arg_required_else_help = true)]
 struct Args {
-    /// Input directory with audio files
+    /// Input directory with audio files to randomize
     input_dir: String,
 
-    /// Optional number of permutations to generate (default is 1)
+    /// Optional number of randomized orders to generate (default is 1)
     permutations: Option<usize>,
 
     /// Optional output root path (default is input path parent dir)
-    #[arg(short, long)]
+    #[arg(short, long = "output")]
     output_path: Option<String>,
 
     /// Overwrite existing output directories
@@ -28,7 +28,7 @@ struct Args {
     force: bool,
 
     /// Verbose output
-    #[arg(long)]
+    #[arg(short, long)]
     verbose: bool,
 }
 
@@ -41,7 +41,7 @@ fn main() -> Result<()> {
     let filepath = Path::new(input_path);
     if !filepath.is_dir() {
         anyhow::bail!(
-            "Directory does not exist or is not accessible: '{}'",
+            "Input directory does not exist or is not accessible: '{}'",
             filepath.display()
         );
     }
@@ -77,12 +77,6 @@ fn main() -> Result<()> {
             }
         }
     };
-
-    println!(
-        "Generating {} randomized audio file permutations to: {}\n",
-        permutations,
-        absolute_output_root.display()
-    );
 
     fdo_impro_randomizer(
         &absolute_input_path,

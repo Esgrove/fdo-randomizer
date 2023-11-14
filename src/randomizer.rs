@@ -5,6 +5,9 @@ use rand::seq::SliceRandom;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+/// Generate randomized play orders for the audio files from the given input directory.
+/// Copies audio files from input folder to new folders with numbered names in the created random order.
+/// The permutation parameter controls how many folders to generate.
 pub fn fdo_impro_randomizer(
     input_path: &PathBuf,
     output_root: PathBuf,
@@ -12,6 +15,12 @@ pub fn fdo_impro_randomizer(
     verbose: bool,
     overwrite_existing: bool,
 ) -> Result<()> {
+    println!(
+        "Generating {} randomized audio file permutations to: {}\n",
+        permutations,
+        input_path.display()
+    );
+
     let mut files: Vec<PathBuf> = fs::read_dir(input_path)
         .context("Failed to read input directory")?
         .filter_map(|entry| entry.ok())
@@ -29,7 +38,7 @@ pub fn fdo_impro_randomizer(
         anyhow::bail!("No audio files found in: '{}'", input_path.display());
     }
 
-    // Sort the files
+    // Sort the files and remove duplicates
     files.sort();
     files.dedup();
 
@@ -93,6 +102,8 @@ pub fn fdo_impro_randomizer(
     Ok(())
 }
 
+/// Returns false when there are no consecutive files with the same artist name.
+/// This assumes all files are named in the format: <artist> - <title>
 fn check_consecutive_tracks_from_same_artist(tracks: &Vec<PathBuf>) -> bool {
     if tracks.len() < 2 {
         return false;
@@ -100,7 +111,7 @@ fn check_consecutive_tracks_from_same_artist(tracks: &Vec<PathBuf>) -> bool {
     tracks
         .iter()
         .filter_map(|path| path.file_stem()?.to_str())
-        .map(|s| s.split(" - ").next().unwrap_or(""))
+        .map(|s| s.split(" - ").next().unwrap_or(s))
         .collect::<Vec<_>>()
         .windows(2)
         .any(|pair| match pair {
@@ -109,8 +120,9 @@ fn check_consecutive_tracks_from_same_artist(tracks: &Vec<PathBuf>) -> bool {
         })
 }
 
+/// Returns true if the given file is one of the supported audio file types
 fn is_audio_file(path: &Path) -> bool {
-    let audio_extensions = ["aif", "aiff", "wav", "flac", "mp3", "m4a"];
+    let audio_extensions = ["aif", "aiff", "flac", "mp3", "m4a", "wav"];
     match path.extension() {
         Some(ext) => {
             let ext_str = ext.to_string_lossy().to_lowercase();
