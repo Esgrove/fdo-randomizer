@@ -9,7 +9,6 @@ use std::fs;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
 
-use chrono;
 use std::time::{Duration, Instant};
 
 /// Generate randomized play orders for the audio files from the given input directory.
@@ -47,7 +46,7 @@ pub fn generate_unique_permutations(
     files.sort();
     files.dedup();
 
-    // Might run into problems with uniqueness if there are not enough audio files
+    // Might run into problems with uniqueness if there is only a small number of files
     let num_permutations: usize = if files.len() <= 20 {
         // Calculate factorial for number of files
         let max_unique_permutations: usize = (1..=files.len()).product();
@@ -78,6 +77,8 @@ pub fn generate_unique_permutations(
             println!("{:>width$}: {}", index + 1, file.display(), width = files_padding);
         }
     }
+
+    // Keep track of generated randomized orderings
     let mut orderings: HashSet<u64> = HashSet::new();
     let start_time = Instant::now();
     for number in 1..=num_permutations {
@@ -155,7 +156,7 @@ fn get_unique_file_ordering(files: &mut Vec<PathBuf>, orderings: &mut HashSet<u6
     files.shuffle(&mut rng);
     let mut hash = get_ordering_hash(files);
     let mut tries: usize = 0;
-    while check_consecutive_tracks_from_same_artist(&files) || orderings.contains(&hash) {
+    while check_consecutive_tracks_from_same_artist(files) || orderings.contains(&hash) {
         files.shuffle(&mut rng);
         hash = get_ordering_hash(files);
         tries += 1;

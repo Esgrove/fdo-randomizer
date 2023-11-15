@@ -2,10 +2,10 @@ mod randomizer;
 
 extern crate colored;
 
+use crate::randomizer::generate_unique_permutations;
+
 use anyhow::{Context, Result};
 use clap::Parser;
-
-use crate::randomizer::generate_unique_permutations;
 use colored::Colorize;
 use std::path::Path;
 use std::{env, fs};
@@ -48,8 +48,8 @@ fn main() -> Result<()> {
     let absolute_input_path = fs::canonicalize(filepath)?;
 
     println!("Input path: {}", absolute_input_path.display());
-
     let mut permutations = args.permutations.unwrap_or(1);
+
     if permutations > 99 {
         println!(
             "{}",
