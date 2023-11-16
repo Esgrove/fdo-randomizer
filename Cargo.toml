@@ -1,3 +1,5 @@
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [package]
 name = "fdo-randomizer"
 authors = ["Akseli Lukkarila <esgrove@outlook.com>"]
@@ -16,3 +18,13 @@ chrono = "0.4.31"
 clap = { version = "4.4.8", features = ["derive"] }
 colored = "2.0.4"
 rand = "0.8.5"
+
+[[bin]]
+name = "fdo-randomizer"
+path = "src/main.rs"
+
+[profile.release]
+lto = true
+incremental = true
+# https://doc.rust-lang.org/rustc/codegen-options/index.html#codegen-units
+codegen-units = 1
