@@ -62,8 +62,7 @@ pub fn generate_unique_permutations(
     };
 
     println!(
-        "Generating {} randomized audio file permutations of {} tracks to: {}\n",
-        num_permutations,
+        "Generating {num_permutations} randomized audio file permutations of {} tracks to: {}\n",
         files.len(),
         absolute_output_root.display()
     );
@@ -150,7 +149,7 @@ fn check_consecutive_tracks_from_same_artist(tracks: &Vec<PathBuf>) -> bool {
 }
 
 /// Keep shuffling song order until there are no consecutive tracks from the same artists
-/// and the order is different from all previous orderings
+/// and the order is different from all previous orderings.
 fn get_unique_file_ordering(files: &mut Vec<PathBuf>, orderings: &mut HashSet<u64>) -> Result<()> {
     let mut rng = rand::thread_rng();
     files.shuffle(&mut rng);
