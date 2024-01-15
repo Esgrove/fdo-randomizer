@@ -1,0 +1,44 @@
+name: Rust
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - "**.rs"
+      - "rust/Cargo.lock"
+      - "rust/Cargo.toml"
+  pull_request:
+    branches:
+      - master
+      - main
+    paths:
+      - "**.rs"
+      - "rust/Cargo.lock"
+      - "rust/Cargo.toml"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out source repository
+      uses: actions/checkout@v3
+
+    - name: Set up Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+          
+    - name: Build
+      run: cargo build --verbose
+
+    - name: Format
+      run: cargo fmt --check --verbose
+
+    - name: Lint
+      run: cargo clippy -- -Dwarnings
