@@ -6,13 +6,13 @@ Created for the [Finnish Dance Organization](https://fdo.fi/) "Improvisation" co
 
 ## Python version
 
-> [!NOTE]  
+> [!NOTE]
 > You should probably be using the newer and better Rust version instead.
 
 ### Dependencies
 
 - Python 3.11+ & Poetry
-- Click
+- click
 - colorama
 
 ### Run
@@ -23,7 +23,9 @@ python3 randomizer.py <input_dir> [num_permutations]
 
 ## Rust version
 
-```
+```console
+FDO Impro competition song randomizer.
+
 Usage: fdo-randomizer [OPTIONS] <INPUT_DIR> [PERMUTATIONS]
 
 Arguments:
@@ -38,9 +40,16 @@ Options:
   -V, --version               Print version
 ```
 
-### Run
+### Build and run
 
 [Install Rust](https://www.rust-lang.org/tools/install) and then:
+
+```shell
+./build.sh
+./fdo-randomizer --help
+```
+
+Or directly with:
 
 ```shell
 cargo run --release -- --help

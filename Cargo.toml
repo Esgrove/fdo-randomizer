@@ -8,23 +8,25 @@ edition = "2021"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/Esgrove/fdo_randomizer"
-version = "1.1.0"
+version = "1.1.1"
 keywords = ["cli", "music", "randomizer"]
 categories = ["command-line-utilities"]
 
 [dependencies]
-anyhow = { version = "1.0.75", features = ["backtrace"] }
+anyhow = { version = "1.0.79", features = ["backtrace"] }
 chrono = "0.4.31"
-clap = { version = "4.4.8", features = ["derive"] }
-colored = "2.0.4"
+clap = { version = "4.4.17", features = ["derive"] }
+colored = "2.1.0"
 rand = "0.8.5"
 
 [[bin]]
 name = "fdo-randomizer"
 path = "src/main.rs"
 
+[profile.dev]
+incremental = true
+
 [profile.release]
 lto = true
-incremental = true
 # https://doc.rust-lang.org/rustc/codegen-options/index.html#codegen-units
 codegen-units = 1
