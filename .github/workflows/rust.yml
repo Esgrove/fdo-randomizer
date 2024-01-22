@@ -24,7 +24,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  cargo:
+  rust:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
