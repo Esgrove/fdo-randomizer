@@ -7,8 +7,8 @@ on:
       - main
     paths:
       - "**.rs"
-      - "rust/Cargo.lock"
-      - "rust/Cargo.toml"
+      - "Cargo.lock"
+      - "Cargo.toml"
       - ".github/workflows/rust.yml"
   pull_request:
     branches:
@@ -16,8 +16,8 @@ on:
       - main
     paths:
       - "**.rs"
-      - "rust/Cargo.lock"
-      - "rust/Cargo.toml"
+      - "Cargo.lock"
+      - "Cargo.toml"
       - ".github/workflows/rust.yml"
 
 env:
