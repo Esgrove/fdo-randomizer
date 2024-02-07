@@ -18,7 +18,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.1.15"
+    rev: "v0.2.1"
     hooks:
       - id: ruff
         name: python ruff
@@ -42,15 +42,15 @@ repos:
       - id: rust-fmt
         name: rust fmt format
         description: Run cargo fmt on files included in the commit. rustfmt should be installed before-hand.
-        entry: bash -c 'cargo fmt'
-        pass_filenames: true
+        entry: cargo fmt
+        pass_filenames: false
         types: [file, rust]
         language: system
 
       - id: rust-clippy
         name: rust clippy lint
         description: Run cargo clippy on files included in the commit. clippy should be installed before-hand.
-        entry: bash -c 'cargo clippy'
+        entry: cargo clippy
         pass_filenames: false
         types: [file, rust]
         language: system
