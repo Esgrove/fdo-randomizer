@@ -132,7 +132,7 @@ pub fn generate_unique_permutations(
 
 /// Returns true if there are consecutive files with the same artist name.
 /// This assumes all files are named in the format: <artist> - <title>
-fn check_consecutive_tracks_from_same_artist(tracks: &Vec<PathBuf>) -> bool {
+fn check_consecutive_tracks_from_same_artist(tracks: &[PathBuf]) -> bool {
     if tracks.len() < 2 {
         return false;
     }
