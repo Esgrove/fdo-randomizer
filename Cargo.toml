@@ -13,7 +13,7 @@ keywords = ["cli", "music", "randomizer"]
 categories = ["command-line-utilities"]
 
 [dependencies]
-anyhow = { version = "1.0.79", features = ["backtrace"] }
+anyhow = { version = "1.0.80", features = ["backtrace"] }
 chrono = "0.4.34"
 clap = { version = "4.5.1", features = ["derive"] }
 colored = "2.1.0"
