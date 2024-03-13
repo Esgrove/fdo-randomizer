@@ -189,8 +189,8 @@ fn is_audio_file(path: &Path) -> bool {
 
 /// Pretty-print elapsed time duration
 fn print_duration(elapsed: Duration) {
-    let duration = chrono::Duration::seconds(elapsed.as_secs() as i64)
-        + chrono::Duration::milliseconds(elapsed.subsec_millis() as i64);
+    let duration = chrono::TimeDelta::try_seconds(elapsed.as_secs() as i64).unwrap()
+        + chrono::TimeDelta::try_milliseconds(elapsed.subsec_millis() as i64).unwrap();
 
     let hours = duration.num_hours();
     let minutes = if hours > 0 {
