@@ -1,8 +1,3 @@
-use anyhow::Context;
-use anyhow::Result;
-use colored::Colorize;
-use rand::seq::SliceRandom;
-
 use std::cmp::min;
 use std::collections::hash_map::DefaultHasher;
 use std::collections::HashSet;
@@ -10,6 +5,11 @@ use std::fs;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
+
+use anyhow::Context;
+use anyhow::Result;
+use colored::Colorize;
+use rand::seq::SliceRandom;
 
 /// Generate randomized play orders for the audio files from the given input directory.
 /// Copies audio files from input folder to new folders with numbered names in the created random order.

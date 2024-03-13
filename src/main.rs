@@ -1,14 +1,13 @@
 mod randomizer;
 
-extern crate colored;
-
-use crate::randomizer::generate_unique_permutations;
+use std::path::Path;
+use std::{env, fs};
 
 use anyhow::{Context, Result};
 use clap::Parser;
 use colored::Colorize;
-use std::path::Path;
-use std::{env, fs};
+
+use crate::randomizer::generate_unique_permutations;
 
 #[derive(Parser)]
 #[command(author, about, version, arg_required_else_help = true)]
