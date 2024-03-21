@@ -14,11 +14,11 @@ Arguments:
   [PERMUTATIONS]  Optional number of randomized orders to generate (default is 1)
 
 Options:
-  -o, --output <OUTPUT_PATH>  Optional output root path (default is input path parent dir)
-  -f, --force                 Overwrite existing output directories
-  -v, --verbose               Verbose output
-  -h, --help                  Print help
-  -V, --version               Print version
+  -o, --output <PATH>  Optional output root path (default is input path parent dir)
+  -f, --force          Overwrite existing output directories
+  -v, --verbose        Verbose output
+  -h, --help           Print help
+  -V, --version        Print version
 ```
 
 ### Build and run
