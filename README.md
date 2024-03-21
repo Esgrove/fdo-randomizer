@@ -4,28 +4,9 @@ Generate randomized play orders from a given folder of audio files.
 
 Created for the [Finnish Dance Organization](https://fdo.fi/) "Improvisation" competition category music.
 
-## Python version
-
-> [!NOTE]
-> You should probably be using the newer and better Rust version instead.
-
-### Dependencies
-
-- Python 3.11+ & Poetry
-- click
-- colorama
-
-### Run
-
-```shell
-python3 randomizer.py <input_dir> [num_permutations]
-```
-
 ## Rust version
 
 ```console
-FDO Impro competition song randomizer.
-
 Usage: fdo-randomizer [OPTIONS] <INPUT_DIR> [PERMUTATIONS]
 
 Arguments:
@@ -61,4 +42,23 @@ Debug errors:
 
 ```shell
 RUST_BACKTRACE=1 cargo run -- FOLDER 8 --force --output "$HOME/Downloads/IMPRO"
+```
+
+## Python version
+
+> [!NOTE]
+> You should probably be using the newer and better Rust version instead.
+
+### Dependencies
+
+- Python 3.11+
+- click
+- colorama
+
+Project is handled by [Poetry](https://github.com/python-poetry/poetry).
+
+### Run
+
+```shell
+python3 randomizer.py <input_dir> [num_permutations]
 ```
