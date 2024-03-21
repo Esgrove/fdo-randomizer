@@ -23,28 +23,12 @@ pub fn generate_unique_permutations(
 ) -> Result<()> {
     fs::create_dir_all(output_root.clone()).context("Failed to create output root directory")?;
     let absolute_output_root =
-        fs::canonicalize(output_root).context("Failed to get absolute path for output root directory")?;
+        dunce::canonicalize(output_root).context("Failed to get absolute path for output root directory")?;
 
-    let mut files: Vec<PathBuf> = fs::read_dir(input_path)
-        .context("Failed to read input directory")?
-        .filter_map(|entry| entry.ok())
-        .filter_map(|entry| {
-            let path = entry.path();
-            if is_audio_file(&path) {
-                Some(path)
-            } else {
-                None
-            }
-        })
-        .collect();
-
+    let mut files = gather_audio_files(input_path)?;
     if files.is_empty() {
         anyhow::bail!("No audio files found in: '{}'", input_path.display());
     }
-
-    // Sort the files and remove duplicates
-    files.sort();
-    files.dedup();
 
     // Might run into problems with uniqueness if there is only a small number of files
     let num_permutations: usize = if files.len() <= 20 {
@@ -68,8 +52,6 @@ pub fn generate_unique_permutations(
     );
 
     let files_padding = files.len().to_string().chars().count();
-    let permutations_padding = num_permutations.to_string().chars().count();
-
     if verbose {
         println!("Input files:");
         for (index, file) in files.iter().enumerate() {
@@ -79,6 +61,7 @@ pub fn generate_unique_permutations(
 
     // Keep track of generated randomized orderings
     let mut orderings: HashSet<u64> = HashSet::new();
+    let permutations_padding = num_permutations.to_string().chars().count();
     let start_time = Instant::now();
     for number in 1..=num_permutations {
         let output_name = format!("FDO Impro {:0width$}", number, width = permutations_padding);
@@ -128,6 +111,27 @@ pub fn generate_unique_permutations(
     print_duration(elapsed);
 
     Ok(())
+}
+
+fn gather_audio_files(input_path: &PathBuf) -> Result<Vec<PathBuf>> {
+    let mut files: Vec<PathBuf> = fs::read_dir(input_path)
+        .context("Failed to read input directory")?
+        .filter_map(|entry| entry.ok())
+        .filter_map(|entry| {
+            let path = entry.path();
+            if is_audio_file(&path) {
+                Some(path)
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    // Sort the files and remove duplicates
+    files.sort();
+    files.dedup();
+
+    Ok(files)
 }
 
 /// Returns true if there are consecutive files with the same artist name.
