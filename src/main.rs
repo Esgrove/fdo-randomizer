@@ -19,7 +19,7 @@ struct Args {
     permutations: Option<usize>,
 
     /// Optional output root path (default is input path parent dir)
-    #[arg(short, long = "output")]
+    #[arg(short, long = "output", name = "PATH")]
     output_path: Option<String>,
 
     /// Overwrite existing output directories
