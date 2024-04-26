@@ -6,8 +6,7 @@ use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use anyhow::Context;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use colored::Colorize;
 use rand::seq::SliceRandom;
 
@@ -91,20 +90,7 @@ pub fn generate_unique_permutations(
         get_unique_file_ordering(&mut files, &mut orderings)?;
 
         fs::create_dir_all(output_path.clone()).context("Failed to create output directory")?;
-
-        for (n, original_file) in files.iter().enumerate() {
-            let new_file_name = format!(
-                "{:0width$} FDO impro - {}",
-                n + 1,
-                original_file.file_name().unwrap().to_str().unwrap(),
-                width = files.len().to_string().len()
-            );
-            let new_file = output_path.join(new_file_name);
-            if verbose {
-                println!("  Copying to: {}", new_file.display());
-            }
-            fs::copy(original_file, new_file).context("Failed to copy file")?;
-        }
+        copy_files_with_numbered_naming(&files, &output_path, verbose)?;
     }
 
     let elapsed = start_time.elapsed();
@@ -113,6 +99,26 @@ pub fn generate_unique_permutations(
     Ok(())
 }
 
+/// Copy files to given new folder with a running index added to the start of the filename.
+fn copy_files_with_numbered_naming(files: &[PathBuf], output_path: &Path, verbose: bool) -> Result<()> {
+    for (n, original_file) in files.iter().enumerate() {
+        let new_file_name = format!(
+            "{:0width$} FDO impro - {}",
+            n + 1,
+            original_file.file_name().unwrap().to_str().unwrap(),
+            width = files.len().to_string().len()
+        );
+        let new_file = output_path.join(new_file_name);
+        if verbose {
+            println!("  Copying to: {}", new_file.display());
+        }
+        fs::copy(original_file, new_file).context("Failed to copy file")?;
+    }
+    Ok(())
+}
+
+/// Get a list of all the audio files present in the input path.
+/// Note: non-recursive so only looks at the files directly in the given directory.
 fn gather_audio_files(input_path: &PathBuf) -> Result<Vec<PathBuf>> {
     let mut files: Vec<PathBuf> = fs::read_dir(input_path)
         .context("Failed to read input directory")?

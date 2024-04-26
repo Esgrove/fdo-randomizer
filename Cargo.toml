@@ -6,12 +6,12 @@ edition = "2021"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/Esgrove/fdo-randomizer"
-version = "1.2.0"
+version = "1.2.1"
 keywords = ["cli", "music", "randomizer"]
 categories = ["command-line-utilities"]
 
 [dependencies]
-anyhow = { version = "1.0.81", features = ["backtrace"] }
+anyhow = { version = "1.0.82", features = ["backtrace"] }
 chrono = "0.4.38"
 clap = { version = "4.5.4", features = ["derive"] }
 colored = "2.1.0"

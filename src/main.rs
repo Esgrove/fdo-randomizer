@@ -7,7 +7,7 @@ use anyhow::{Context, Result};
 use clap::Parser;
 use colored::Colorize;
 
-use crate::randomizer::generate_unique_permutations;
+use crate::randomizer;
 
 #[derive(Parser)]
 #[command(author, about, version, arg_required_else_help = true)]
@@ -77,7 +77,7 @@ fn main() -> Result<()> {
         }
     };
 
-    generate_unique_permutations(
+    randomizer::generate_unique_permutations(
         &absolute_input_path,
         absolute_output_root,
         permutations,
