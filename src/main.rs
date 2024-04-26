@@ -7,8 +7,6 @@ use anyhow::{Context, Result};
 use clap::Parser;
 use colored::Colorize;
 
-use crate::randomizer;
-
 #[derive(Parser)]
 #[command(author, about, version, arg_required_else_help = true)]
 struct Args {
