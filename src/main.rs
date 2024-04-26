@@ -1,7 +1,7 @@
 mod randomizer;
 
+use std::env;
 use std::path::Path;
-use std::{env, fs};
 
 use anyhow::{Context, Result};
 use clap::Parser;
@@ -42,7 +42,7 @@ fn main() -> Result<()> {
             filepath.display()
         );
     }
-    let absolute_input_path = fs::canonicalize(filepath)?;
+    let absolute_input_path = dunce::canonicalize(filepath)?;
 
     println!("Input path: {}", absolute_input_path.display());
     let mut permutations = args.permutations.unwrap_or(1);
@@ -69,7 +69,7 @@ fn main() -> Result<()> {
             if path.is_absolute() {
                 path.to_path_buf()
             } else {
-                let current_dir = fs::canonicalize(env::current_dir().context("Failed to get current directory")?)?;
+                let current_dir = dunce::canonicalize(env::current_dir().context("Failed to get current directory")?)?;
                 current_dir.join(path)
             }
         }
