@@ -60,5 +60,5 @@ Project is handled by [Poetry](https://github.com/python-poetry/poetry).
 ### Run
 
 ```shell
-python3 randomizer.py <input_dir> [num_permutations]
+poetry run python randomizer/randomizer.py <input_dir> [num_permutations]
 ```
