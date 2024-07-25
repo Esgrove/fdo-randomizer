@@ -1,19 +1,19 @@
 [package]
 name = "fdo-randomizer"
+version = "1.2.2"
 authors = ["Akseli Lukkarila <esgrove@outlook.com>"]
 description = "FDO Impro competition song randomizer."
 edition = "2021"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/Esgrove/fdo-randomizer"
-version = "1.2.1"
 keywords = ["cli", "music", "randomizer"]
 categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = { version = "1.0.86", features = ["backtrace"] }
 chrono = "0.4.38"
-clap = { version = "4.5.9", features = ["derive"] }
+clap = { version = "4.5.11", features = ["derive"] }
 colored = "2.1.0"
 dunce = "1.0.4"
 rand = "0.8.5"
