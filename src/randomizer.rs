@@ -10,6 +10,8 @@ use anyhow::{Context, Result};
 use colored::Colorize;
 use rand::seq::SliceRandom;
 
+static AUDIO_EXTENSIONS: [&str; 6] = ["aif", "aiff", "flac", "mp3", "m4a", "wav"];
+
 /// Generate randomized play orders for the audio files from the given input directory.
 /// Copies audio files from input folder to new folders with numbered names in the created random order.
 /// The permutation parameter controls how many folders to generate.
@@ -20,7 +22,7 @@ pub fn generate_unique_permutations(
     verbose: bool,
     overwrite_existing: bool,
 ) -> Result<()> {
-    fs::create_dir_all(output_root.clone()).context("Failed to create output root directory")?;
+    fs::create_dir_all(&output_root).context("Failed to create output root directory")?;
     let absolute_output_root =
         dunce::canonicalize(output_root).context("Failed to get absolute path for output root directory")?;
 
@@ -187,11 +189,10 @@ fn get_ordering_hash(files: &mut Vec<PathBuf>) -> u64 {
 
 /// Returns true if the given file is one of the supported audio file types
 fn is_audio_file(path: &Path) -> bool {
-    let audio_extensions = ["aif", "aiff", "flac", "mp3", "m4a", "wav"];
     match path.extension() {
         Some(ext) => {
             let ext_str = ext.to_string_lossy().to_lowercase();
-            audio_extensions.contains(&ext_str.as_str())
+            AUDIO_EXTENSIONS.contains(&ext_str.as_str())
         }
         None => false,
     }

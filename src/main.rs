@@ -43,10 +43,9 @@ fn main() -> Result<()> {
         );
     }
     let absolute_input_path = dunce::canonicalize(filepath)?;
-
     println!("Input path: {}", absolute_input_path.display());
-    let mut permutations = args.permutations.unwrap_or(1);
 
+    let mut permutations = args.permutations.unwrap_or(1);
     if permutations > 99 {
         println!(
             "{}",
