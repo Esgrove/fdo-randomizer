@@ -147,7 +147,7 @@ fn gather_audio_files(input_path: &PathBuf) -> Result<Vec<PathBuf>> {
 }
 
 /// Returns true if there are consecutive files with the same artist name.
-/// This assumes all files are named in the format: <artist> - <title>
+/// This assumes all files are named in the format: <artist> - <title>.
 fn check_consecutive_tracks_from_same_artist(tracks: &[PathBuf]) -> bool {
     if tracks.len() < 2 {
         return false;
@@ -164,7 +164,7 @@ fn check_consecutive_tracks_from_same_artist(tracks: &[PathBuf]) -> bool {
         })
 }
 
-/// Keep shuffling song order until there are no consecutive tracks from the same artists
+/// Keep shuffling song order until there are no consecutive tracks from the same artists,
 /// and the order is different from all previous orderings.
 fn get_unique_file_ordering(files: &mut Vec<PathBuf>, orderings: &mut HashSet<u64>) -> Result<()> {
     let mut rng = rand::thread_rng();
@@ -184,14 +184,14 @@ fn get_unique_file_ordering(files: &mut Vec<PathBuf>, orderings: &mut HashSet<u6
     Ok(())
 }
 
-/// Calculate hash for the given list order
+/// Calculate hash for the given list order.
 fn get_ordering_hash(files: &Vec<PathBuf>) -> u64 {
     let mut hasher = DefaultHasher::new();
     files.hash(&mut hasher);
     hasher.finish()
 }
 
-/// Returns true if the given file is one of the supported audio file types
+/// Returns true if the given file is one of the supported audio file types.
 fn is_audio_file(path: &Path) -> bool {
     path.extension().map_or(false, |ext| {
         let ext_str = ext.to_string_lossy().to_lowercase();
@@ -199,13 +199,9 @@ fn is_audio_file(path: &Path) -> bool {
     })
 }
 
-/// Pretty-print elapsed time duration
+/// Pretty-print elapsed time duration.
 fn print_duration(elapsed: Duration) -> Result<()> {
-    #[allow(clippy::cast_possible_wrap)]
-    let duration = chrono::TimeDelta::try_seconds(elapsed.as_secs() as i64)
-        .ok_or_else(|| anyhow!("Failed to create duration from seconds"))?
-        + chrono::TimeDelta::try_milliseconds(i64::from(elapsed.subsec_millis()))
-            .ok_or_else(|| anyhow!("Failed to create duration from milliseconds"))?;
+    let duration = chrono::TimeDelta::from_std(elapsed)?;
 
     let hours = duration.num_hours();
     let minutes = if hours > 0 {
