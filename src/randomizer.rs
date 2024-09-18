@@ -66,7 +66,7 @@ pub fn generate_unique_permutations(
     let start_time = Instant::now();
     for number in 1..=num_permutations {
         let output_name = format!("FDO Impro {number:0permutations_padding$}");
-        let output_path = absolute_output_root.join(output_name.clone());
+        let output_path = absolute_output_root.join(&output_name);
 
         println!(
             "{}Copying files for {}...",
@@ -79,7 +79,7 @@ pub fn generate_unique_permutations(
                     "{}",
                     format!("Deleting existing output directory '{}'", output_path.display()).yellow()
                 );
-                fs::remove_dir_all(output_path.clone()).context(format!(
+                fs::remove_dir_all(&output_path).context(format!(
                     "Failed to remove existing output directory {}",
                     output_path.display()
                 ))?;
@@ -91,7 +91,7 @@ pub fn generate_unique_permutations(
 
         get_unique_file_ordering(&mut files, &mut orderings)?;
 
-        fs::create_dir_all(output_path.clone()).context("Failed to create output directory")?;
+        fs::create_dir_all(&output_path).context("Failed to create output directory")?;
         copy_files_with_numbered_naming(&files, &output_path, verbose)?;
     }
 
