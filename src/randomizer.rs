@@ -6,7 +6,7 @@ use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use colored::Colorize;
 use rand::seq::SliceRandom;
 
@@ -56,7 +56,7 @@ pub fn generate_unique_permutations(
     if verbose {
         println!("Input files:");
         for (index, file) in files.iter().enumerate() {
-            println!("{:>width$}: {}", index + 1, file.display(), width = files_padding);
+            println!("{:>files_padding$}: {}", index + 1, file.display());
         }
     }
 
@@ -65,7 +65,7 @@ pub fn generate_unique_permutations(
     let permutations_padding = num_permutations.to_string().chars().count();
     let start_time = Instant::now();
     for number in 1..=num_permutations {
-        let output_name = format!("FDO Impro {:0width$}", number, width = permutations_padding);
+        let output_name = format!("FDO Impro {number:0permutations_padding$}");
         let output_path = absolute_output_root.join(output_name.clone());
 
         println!(
@@ -96,25 +96,29 @@ pub fn generate_unique_permutations(
     }
 
     let elapsed = start_time.elapsed();
-    print_duration(elapsed);
+    print_duration(elapsed)?;
 
     Ok(())
 }
 
 /// Copy files to given new folder with a running index added to the start of the filename.
 fn copy_files_with_numbered_naming(files: &[PathBuf], output_path: &Path, verbose: bool) -> Result<()> {
-    for (n, original_file) in files.iter().enumerate() {
-        let new_file_name = format!(
-            "{:0width$} FDO impro - {}",
-            n + 1,
-            original_file.file_name().unwrap().to_str().unwrap(),
-            width = files.len().to_string().len()
-        );
+    for (index, original_file) in files.iter().enumerate() {
+        let file_name = original_file
+            .file_name()
+            .and_then(|os_str| os_str.to_str())
+            .ok_or_else(|| anyhow!("Invalid file name in path: {:?}", original_file))?;
+
+        let width = files.len().to_string().len();
+        let number = index + 1;
+        let new_file_name = format!("{number:0width$} FDO impro - {file_name}");
         let new_file = output_path.join(new_file_name);
+
         if verbose {
             println!("  Copying to: {}", new_file.display());
         }
-        fs::copy(original_file, new_file).context("Failed to copy file")?;
+
+        fs::copy(original_file, &new_file).context("Failed to copy file")?;
     }
     Ok(())
 }
@@ -124,7 +128,7 @@ fn copy_files_with_numbered_naming(files: &[PathBuf], output_path: &Path, verbos
 fn gather_audio_files(input_path: &PathBuf) -> Result<Vec<PathBuf>> {
     let mut files: Vec<PathBuf> = fs::read_dir(input_path)
         .context("Failed to read input directory")?
-        .filter_map(|entry| entry.ok())
+        .filter_map(std::result::Result::ok)
         .filter_map(|entry| {
             let path = entry.path();
             if is_audio_file(&path) {
@@ -181,7 +185,7 @@ fn get_unique_file_ordering(files: &mut Vec<PathBuf>, orderings: &mut HashSet<u6
 }
 
 /// Calculate hash for the given list order
-fn get_ordering_hash(files: &mut Vec<PathBuf>) -> u64 {
+fn get_ordering_hash(files: &Vec<PathBuf>) -> u64 {
     let mut hasher = DefaultHasher::new();
     files.hash(&mut hasher);
     hasher.finish()
@@ -189,19 +193,19 @@ fn get_ordering_hash(files: &mut Vec<PathBuf>) -> u64 {
 
 /// Returns true if the given file is one of the supported audio file types
 fn is_audio_file(path: &Path) -> bool {
-    match path.extension() {
-        Some(ext) => {
-            let ext_str = ext.to_string_lossy().to_lowercase();
-            AUDIO_EXTENSIONS.contains(&ext_str.as_str())
-        }
-        None => false,
-    }
+    path.extension().map_or(false, |ext| {
+        let ext_str = ext.to_string_lossy().to_lowercase();
+        AUDIO_EXTENSIONS.contains(&ext_str.as_str())
+    })
 }
 
 /// Pretty-print elapsed time duration
-fn print_duration(elapsed: Duration) {
-    let duration = chrono::TimeDelta::try_seconds(elapsed.as_secs() as i64).unwrap()
-        + chrono::TimeDelta::try_milliseconds(elapsed.subsec_millis() as i64).unwrap();
+fn print_duration(elapsed: Duration) -> Result<()> {
+    #[allow(clippy::cast_possible_wrap)]
+    let duration = chrono::TimeDelta::try_seconds(elapsed.as_secs() as i64)
+        .ok_or_else(|| anyhow!("Failed to create duration from seconds"))?
+        + chrono::TimeDelta::try_milliseconds(i64::from(elapsed.subsec_millis()))
+            .ok_or_else(|| anyhow!("Failed to create duration from milliseconds"))?;
 
     let hours = duration.num_hours();
     let minutes = if hours > 0 {
@@ -215,21 +219,24 @@ fn print_duration(elapsed: Duration) {
         duration.num_seconds()
     };
     let milliseconds = if seconds > 0 {
-        duration.num_milliseconds() % 60
+        duration.num_milliseconds() % 1000
     } else {
         duration.num_milliseconds()
     };
 
     let formatted_time = if hours > 0 {
-        format!("{:02}h:{:02}m:{:02}s", hours, minutes, seconds)
+        format!("{hours:02}h:{minutes:02}m:{seconds:02}s")
     } else if minutes > 0 {
-        format!("{:02}m:{:02}s", minutes, seconds)
+        format!("{minutes:02}m:{seconds:02}s")
     } else if seconds > 0 {
-        format!("{:02}s:{:02}ms", seconds, milliseconds)
+        format!("{seconds:02}s:{milliseconds:02}ms")
     } else {
-        format!("{:02}ms", milliseconds)
+        format!("{milliseconds:02}ms")
     };
+
     if !formatted_time.is_empty() {
-        println!("{} ({:?})", format!("Finished in {}", formatted_time).green(), elapsed);
+        println!("{} ({:?})", format!("Finished in {formatted_time}").green(), elapsed);
     }
+
+    Ok(())
 }
