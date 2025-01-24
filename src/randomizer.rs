@@ -193,7 +193,7 @@ fn get_ordering_hash(files: &Vec<PathBuf>) -> u64 {
 
 /// Returns true if the given file is one of the supported audio file types.
 fn is_audio_file(path: &Path) -> bool {
-    path.extension().map_or(false, |ext| {
+    path.extension().is_some_and(|ext| {
         let ext_str = ext.to_string_lossy().to_lowercase();
         AUDIO_EXTENSIONS.contains(&ext_str.as_str())
     })
