@@ -13,6 +13,7 @@ use rand::seq::SliceRandom;
 static AUDIO_EXTENSIONS: [&str; 6] = ["aif", "aiff", "flac", "mp3", "m4a", "wav"];
 
 /// Generate randomized play orders for the audio files from the given input directory.
+///
 /// Copies audio files from input folder to new folders with numbered names in the created random order.
 /// The permutation parameter controls how many folders to generate.
 pub fn generate_unique_permutations(
@@ -31,20 +32,7 @@ pub fn generate_unique_permutations(
         anyhow::bail!("No audio files found in: '{}'", input_path.display());
     }
 
-    // Might run into problems with uniqueness if there is only a small number of files
-    let num_permutations: usize = if files.len() <= 20 {
-        // Calculate factorial for number of files
-        let max_unique_permutations: usize = (1..=files.len()).product();
-        if permutations > max_unique_permutations {
-            println!(
-                "{}",
-                format!("Limiting permutations to {max_unique_permutations} possible unique orderings!").red()
-            );
-        }
-        min(permutations, max_unique_permutations)
-    } else {
-        permutations
-    };
+    let num_permutations = check_permutations_count(permutations, files.len());
 
     println!(
         "Generating {num_permutations} randomized audio file permutations of {} tracks to: {}\n",
@@ -90,7 +78,6 @@ pub fn generate_unique_permutations(
         }
 
         get_unique_file_ordering(&mut files, &mut orderings)?;
-
         fs::create_dir_all(&output_path).context("Failed to create output directory")?;
         copy_files_with_numbered_naming(&files, &output_path, verbose)?;
     }
@@ -99,6 +86,25 @@ pub fn generate_unique_permutations(
     print_duration(elapsed)?;
 
     Ok(())
+}
+
+/// Return number of permutations that is doable.
+///
+/// Might run into problems with uniqueness if there is only a small number of files.
+fn check_permutations_count(permutations: usize, num_files: usize) -> usize {
+    if num_files <= 20 {
+        // Calculate factorial for number of files
+        let max_unique_permutations: usize = (1..=num_files).product();
+        if permutations > max_unique_permutations {
+            println!(
+                "{}",
+                format!("Limiting permutations to {max_unique_permutations} possible unique orderings!").red()
+            );
+        }
+        min(permutations, max_unique_permutations)
+    } else {
+        permutations
+    }
 }
 
 /// Copy files to given new folder with a running index added to the start of the filename.
@@ -147,6 +153,7 @@ fn gather_audio_files(input_path: &PathBuf) -> Result<Vec<PathBuf>> {
 }
 
 /// Returns true if there are consecutive files with the same artist name.
+///
 /// This assumes all files are named in the format: <artist> - <title>.
 fn check_consecutive_tracks_from_same_artist(tracks: &[PathBuf]) -> bool {
     if tracks.len() < 2 {
@@ -167,7 +174,7 @@ fn check_consecutive_tracks_from_same_artist(tracks: &[PathBuf]) -> bool {
 /// Keep shuffling song order until there are no consecutive tracks from the same artists,
 /// and the order is different from all previous orderings.
 fn get_unique_file_ordering(files: &mut Vec<PathBuf>, orderings: &mut HashSet<u64>) -> Result<()> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     files.shuffle(&mut rng);
     let mut hash = get_ordering_hash(files);
     let mut tries: usize = 0;
