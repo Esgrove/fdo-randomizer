@@ -167,7 +167,7 @@ fn check_consecutive_tracks_from_same_artist(tracks: &[PathBuf]) -> bool {
 /// Keep shuffling song order until there are no consecutive tracks from the same artists,
 /// and the order is different from all previous orderings.
 fn get_unique_file_ordering(files: &mut Vec<PathBuf>, orderings: &mut HashSet<u64>) -> Result<()> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     files.shuffle(&mut rng);
     let mut hash = get_ordering_hash(files);
     let mut tries: usize = 0;
