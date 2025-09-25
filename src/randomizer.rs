@@ -1,12 +1,12 @@
 use std::cmp::min;
-use std::collections::hash_map::DefaultHasher;
 use std::collections::HashSet;
+use std::collections::hash_map::DefaultHasher;
 use std::fs;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use colored::Colorize;
 use rand::seq::SliceRandom;
 
@@ -110,10 +110,11 @@ fn check_permutations_count(permutations: usize, num_files: usize) -> usize {
 /// Copy files to given new folder with a running index added to the start of the filename.
 fn copy_files_with_numbered_naming(files: &[PathBuf], output_path: &Path, verbose: bool) -> Result<()> {
     for (index, original_file) in files.iter().enumerate() {
+        #[allow(clippy::unnecessary_debug_formatting)]
         let file_name = original_file
             .file_name()
             .and_then(|os_str| os_str.to_str())
-            .ok_or_else(|| anyhow!("Invalid file name in path: {:?}", original_file))?;
+            .ok_or_else(|| anyhow!("Invalid file name in path: {original_file:?}"))?;
 
         let width = files.len().to_string().len();
         let number = index + 1;
@@ -137,11 +138,7 @@ fn gather_audio_files(input_path: &PathBuf) -> Result<Vec<PathBuf>> {
         .filter_map(std::result::Result::ok)
         .filter_map(|entry| {
             let path = entry.path();
-            if is_audio_file(&path) {
-                Some(path)
-            } else {
-                None
-            }
+            if is_audio_file(&path) { Some(path) } else { None }
         })
         .collect();
 
