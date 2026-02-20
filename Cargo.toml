@@ -12,7 +12,7 @@ categories = ["command-line-utilities"]
 rust-version = "1.89.0"
 
 [dependencies]
-anyhow = { version = "1.0.101", features = ["backtrace"] }
+anyhow = { version = "1.0.102", features = ["backtrace"] }
 chrono = "0.4.43"
 clap = { version = "4.5.59", features = ["derive"] }
 colored = "3.1.1"
