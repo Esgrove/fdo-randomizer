@@ -7,10 +7,14 @@ Created for the [Finnish Dance Organization](https://fdo.fi/) "Improvisation" co
 ## Rust version
 
 ```console
-Usage: fdo-randomizer [OPTIONS] <INPUT_DIR> [PERMUTATIONS]
+Usage: fdo-randomizer [OPTIONS] [INPUT_DIR] [PERMUTATIONS] [COMMAND]
+
+Commands:
+  completion  Generate shell completion script
+  help        Print this message or the help of the given subcommand(s)
 
 Arguments:
-  <INPUT_DIR>     Input directory with audio files to randomize
+  [INPUT_DIR]     Input directory with audio files to randomize
   [PERMUTATIONS]  Optional number of randomized orders to generate (default is 1)
 
 Options:
@@ -19,6 +23,37 @@ Options:
   -v, --verbose        Verbose output
   -h, --help           Print help
   -V, --version        Print version
+```
+
+## Shell completions
+
+The Rust binary supports shell completion generation via the `completion` subcommand.
+The install script also installs completions for the appropriate shells on your platform:
+
+- Windows: bash and powershell
+- macOS: zsh
+- Linux: zsh and bash
+
+### Install binary and completions
+
+```shell
+./install.sh
+```
+
+### Install completions manually
+
+```shell
+./completions.sh
+```
+
+### Generate manually for a single shell
+
+```shell
+fdo-randomizer completion bash
+fdo-randomizer completion zsh
+
+fdo-randomizer completion zsh --install
+fdo-randomizer completion powershell --install
 ```
 
 ### Build and run

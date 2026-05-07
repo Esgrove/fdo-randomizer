@@ -40,6 +40,7 @@ pub fn generate_unique_permutations(
 
     let files_padding = files.len().to_string().chars().count();
     if verbose {
+        println!("Input path: {}", input_path.display());
         println!("Input files:");
         for (index, file) in files.iter().enumerate() {
             println!("{:>files_padding$}: {}", index + 1, file.display());
