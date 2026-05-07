@@ -186,3 +186,80 @@ fn get_unique_file_ordering(files: &mut Vec<PathBuf>, orderings: &mut HashSet<u6
     orderings.insert(hash);
     Ok(())
 }
+
+#[cfg(test)]
+mod permutation_tests {
+    use super::*;
+
+    fn dummy_tracks(names: &[&str]) -> Vec<PathBuf> {
+        names.iter().map(PathBuf::from).collect()
+    }
+
+    #[test]
+    fn limits_permutations_to_factorial_for_small_track_counts() {
+        assert_eq!(check_permutations_count(10, 3), 6);
+        assert_eq!(check_permutations_count(6, 3), 6);
+        assert_eq!(check_permutations_count(1, 0), 1);
+    }
+
+    #[test]
+    fn does_not_limit_permutations_for_large_track_counts() {
+        assert_eq!(check_permutations_count(1_000, 21), 1_000);
+    }
+
+    #[test]
+    fn detects_consecutive_tracks_from_same_artist() {
+        let tracks = dummy_tracks(&["Artist A - One.mp3", "Artist A - Two.mp3", "Artist B - One.mp3"]);
+        assert!(check_consecutive_tracks_from_same_artist(&tracks));
+    }
+
+    #[test]
+    fn allows_interleaved_tracks_from_same_artist() {
+        let tracks = dummy_tracks(&["Artist A - One.mp3", "Artist B - One.mp3", "Artist A - Two.mp3"]);
+        assert!(!check_consecutive_tracks_from_same_artist(&tracks));
+    }
+
+    #[test]
+    fn generates_unique_ordering_without_consecutive_artists() {
+        let mut tracks = dummy_tracks(&[
+            "Artist A - One.mp3",
+            "Artist A - Two.mp3",
+            "Artist B - One.mp3",
+            "Artist C - One.mp3",
+        ]);
+        let mut orderings = HashSet::new();
+
+        get_unique_file_ordering(&mut tracks, &mut orderings).expect("expected a valid unique ordering");
+
+        let hash = utils::get_ordering_hash(&tracks);
+        assert!(!check_consecutive_tracks_from_same_artist(&tracks));
+        assert_eq!(orderings.len(), 1);
+        assert!(orderings.contains(&hash));
+    }
+
+    #[test]
+    fn avoids_reusing_an_existing_ordering() {
+        let mut tracks = dummy_tracks(&["Artist A - One.mp3", "Artist B - One.mp3"]);
+        let existing_hash = utils::get_ordering_hash(&tracks);
+        let mut orderings = HashSet::from([existing_hash]);
+
+        get_unique_file_ordering(&mut tracks, &mut orderings).expect("expected an alternative ordering");
+
+        let new_hash = utils::get_ordering_hash(&tracks);
+        assert_ne!(new_hash, existing_hash);
+        assert_eq!(orderings.len(), 2);
+        assert!(orderings.contains(&existing_hash));
+        assert!(orderings.contains(&new_hash));
+    }
+
+    #[test]
+    fn errors_when_no_valid_unique_ordering_exists() {
+        let mut tracks = dummy_tracks(&["Artist A - One.mp3", "Artist A - Two.mp3", "Artist A - Three.mp3"]);
+        let mut orderings = HashSet::new();
+
+        let error =
+            get_unique_file_ordering(&mut tracks, &mut orderings).expect_err("expected ordering generation to fail");
+
+        assert!(error.to_string().contains("Failed to create an unique random order"));
+    }
+}
