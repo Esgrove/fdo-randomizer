@@ -1,4 +1,5 @@
 mod randomizer;
+mod utils;
 
 use std::env;
 use std::path::Path;

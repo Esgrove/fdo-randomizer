@@ -1,16 +1,14 @@
 use std::cmp::min;
 use std::collections::HashSet;
-use std::collections::hash_map::DefaultHasher;
 use std::fs;
-use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
 use colored::Colorize;
 use rand::seq::SliceRandom;
 
-static AUDIO_EXTENSIONS: [&str; 6] = ["aif", "aiff", "flac", "mp3", "m4a", "wav"];
+use crate::utils;
 
 /// Generate randomized play orders for the audio files from the given input directory.
 ///
@@ -83,7 +81,7 @@ pub fn generate_unique_permutations(
     }
 
     let elapsed = start_time.elapsed();
-    print_duration(elapsed)?;
+    utils::print_duration(elapsed);
 
     Ok(())
 }
@@ -138,7 +136,7 @@ fn gather_audio_files(input_path: &PathBuf) -> Result<Vec<PathBuf>> {
         .filter_map(std::result::Result::ok)
         .filter_map(|entry| {
             let path = entry.path();
-            if is_audio_file(&path) { Some(path) } else { None }
+            if utils::is_audio_file(&path) { Some(path) } else { None }
         })
         .collect();
 
@@ -173,70 +171,17 @@ fn check_consecutive_tracks_from_same_artist(tracks: &[PathBuf]) -> bool {
 fn get_unique_file_ordering(files: &mut Vec<PathBuf>, orderings: &mut HashSet<u64>) -> Result<()> {
     let mut rng = rand::rng();
     files.shuffle(&mut rng);
-    let mut hash = get_ordering_hash(files);
+    let mut hash = utils::get_ordering_hash(files);
     let mut tries: usize = 0;
     while check_consecutive_tracks_from_same_artist(files) || orderings.contains(&hash) {
         files.shuffle(&mut rng);
-        hash = get_ordering_hash(files);
+        hash = utils::get_ordering_hash(files);
         tries += 1;
         if tries > 1000 {
             anyhow::bail!("Failed to create an unique random order, quitting")
         }
     }
-    hash = get_ordering_hash(files);
+    hash = utils::get_ordering_hash(files);
     orderings.insert(hash);
-    Ok(())
-}
-
-/// Calculate hash for the given list order.
-fn get_ordering_hash(files: &Vec<PathBuf>) -> u64 {
-    let mut hasher = DefaultHasher::new();
-    files.hash(&mut hasher);
-    hasher.finish()
-}
-
-/// Returns true if the given file is one of the supported audio file types.
-fn is_audio_file(path: &Path) -> bool {
-    path.extension().is_some_and(|ext| {
-        let ext_str = ext.to_string_lossy().to_lowercase();
-        AUDIO_EXTENSIONS.contains(&ext_str.as_str())
-    })
-}
-
-/// Pretty-print elapsed time duration.
-fn print_duration(elapsed: Duration) -> Result<()> {
-    let duration = chrono::TimeDelta::from_std(elapsed)?;
-
-    let hours = duration.num_hours();
-    let minutes = if hours > 0 {
-        duration.num_minutes() % 60
-    } else {
-        duration.num_minutes()
-    };
-    let seconds = if minutes > 0 {
-        duration.num_seconds() % 60
-    } else {
-        duration.num_seconds()
-    };
-    let milliseconds = if seconds > 0 {
-        duration.num_milliseconds() % 1000
-    } else {
-        duration.num_milliseconds()
-    };
-
-    let formatted_time = if hours > 0 {
-        format!("{hours:02}h:{minutes:02}m:{seconds:02}s")
-    } else if minutes > 0 {
-        format!("{minutes:02}m:{seconds:02}s")
-    } else if seconds > 0 {
-        format!("{seconds:02}s:{milliseconds:02}ms")
-    } else {
-        format!("{milliseconds:02}ms")
-    };
-
-    if !formatted_time.is_empty() {
-        println!("{} ({:?})", format!("Finished in {formatted_time}").green(), elapsed);
-    }
-
     Ok(())
 }
