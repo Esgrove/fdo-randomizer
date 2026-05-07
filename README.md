@@ -15,14 +15,15 @@ Commands:
 
 Arguments:
   [INPUT_DIR]     Input directory with audio files to randomize
-  [PERMUTATIONS]  Optional number of randomized orders to generate (default is 1)
+  [PERMUTATIONS]  Number of randomized orders to generate
 
 Options:
-  -o, --output <PATH>  Optional output root path (default is input path parent dir)
-  -f, --force          Overwrite existing output directories
-  -v, --verbose        Verbose output
-  -h, --help           Print help
-  -V, --version        Print version
+  -p, --permutations <NUM>  Number of randomized orders to generate [default: 1]
+  -o, --output <PATH>       Optional output root path (default is input path parent dir)
+  -f, --force               Overwrite existing output directories
+  -v, --verbose             Verbose output
+  -h, --help                Print help
+  -V, --version             Print version
 ```
 
 ## Shell completions
@@ -70,13 +71,16 @@ Or directly with:
 ```shell
 cargo run --release -- --help
 
+cargo run --release -- "input dir" --permutations 10
+
+# Positional permutations
 cargo run --release -- "input dir" 10
 ```
 
 Debug errors:
 
 ```shell
-RUST_BACKTRACE=1 cargo run -- FOLDER 8 --force --output "$HOME/Downloads/IMPRO"
+RUST_BACKTRACE=1 cargo run -- FOLDER --permutations 8 --force --output "$HOME/Downloads/IMPRO"
 ```
 
 ## Python version
