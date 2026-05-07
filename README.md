@@ -26,37 +26,6 @@ Options:
   -V, --version             Print version
 ```
 
-## Shell completions
-
-The Rust binary supports shell completion generation via the `completion` subcommand.
-The install script also installs completions for the appropriate shells on your platform:
-
-- Windows: bash and powershell
-- macOS: zsh
-- Linux: zsh and bash
-
-### Install binary and completions
-
-```shell
-./install.sh
-```
-
-### Install completions manually
-
-```shell
-./completions.sh
-```
-
-### Generate manually for a single shell
-
-```shell
-fdo-randomizer completion bash
-fdo-randomizer completion zsh
-
-fdo-randomizer completion zsh --install
-fdo-randomizer completion powershell --install
-```
-
 ### Build and run
 
 [Install Rust](https://www.rust-lang.org/tools/install) and then:
@@ -81,6 +50,37 @@ Debug errors:
 
 ```shell
 RUST_BACKTRACE=1 cargo run -- FOLDER --permutations 8 --force --output "$HOME/Downloads/IMPRO"
+```
+
+### Shell completions
+
+The Rust binary supports shell completion generation via the `completion` subcommand.
+The install script also installs completions for the appropriate shells on your platform:
+
+- Windows: bash and powershell
+- macOS: zsh
+- Linux: zsh and bash
+
+Install binary and completions
+
+```shell
+./install.sh
+```
+
+Install completions
+
+```shell
+./completions.sh
+```
+
+Generate completions manually for a single shell
+
+```shell
+fdo-randomizer completion bash
+fdo-randomizer completion zsh
+
+fdo-randomizer completion zsh --install
+fdo-randomizer completion powershell --install
 ```
 
 ## Python version
